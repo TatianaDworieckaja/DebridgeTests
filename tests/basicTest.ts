@@ -7,13 +7,12 @@ import { MetaMaskNotificationPage } from "../src/pages/MetaMaskNotificationPage"
 import { MetaMaskPopupPage } from "../src/pages/MetaMaskPopupPage";
 
 //TODO e.g. pass as env variable/test data
-const seed =
-  "topic awkward boat express embody brain leader quick anger target clean fever";
 const password = "28032025debridge";
 const extensionUrlPart = "chrome-extension://";
 const deBridgePageUrlPart = "https://app.debridge.finance/";
 const payToken = "Polygon";
 const currency = "MATIC";
+const seed = process.env.SEED;
 
 test("Verify that wallet address and token balance are correct", async ({
   context,
@@ -21,7 +20,7 @@ test("Verify that wallet address and token balance are correct", async ({
 }) => {
   let metamaskPage = await focusOnPage(context, extensionUrlPart);
   const metaMaskOnboardingPage = new MetaMaskOnboardingPage(metamaskPage);
-  await metaMaskOnboardingPage.importExistingWallet(seed, password);
+  await metaMaskOnboardingPage.importExistingWallet(seed!, password);
   await metaMaskOnboardingPage.lockPage();
   await metamaskPage.close();
 
