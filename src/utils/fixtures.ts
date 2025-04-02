@@ -1,12 +1,13 @@
 import { test as base, chromium, type BrowserContext } from "@playwright/test";
 import path from "path";
+import dotenv from "dotenv";
 
 export const test = base.extend<{
   context: BrowserContext;
   extensionId: string;
 }>({
-  context: async ({}, use) => {
-    const pathToExtension = path.join(__dirname, "../extension/metamask");
+  context: async ({ }, use) => {
+    const pathToExtension = path.join(__dirname, "../../extension/metamask");
     const context = await chromium.launchPersistentContext("", {
       channel: "chromium",
       headless: false,
@@ -16,6 +17,7 @@ export const test = base.extend<{
         "--start-maximized",
       ],
     });
+    dotenv.config({ path: path.resolve(__dirname, '../../config/.env') })
     await use(context);
     await context.close();
   },
