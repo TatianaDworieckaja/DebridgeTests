@@ -1,7 +1,7 @@
 import { expect } from "@playwright/test";
 import { test } from "../src/utils/fixtures";
 import { focusOnPage } from "../src/utils/helpers";
-import { DeBridgeHomePage } from "../src/pages/DeBridgeInitPage";
+import { DeBridgeHomePage } from "../src/pages/DeBridgeHomePage";
 import { MetaMaskOnboardingPage } from "../src/pages/MetaMaskOnboardingPage";
 import { MetaMaskNotificationPage } from "../src/pages/MetaMaskNotificationPage";
 import { MetaMaskPopupPage } from "../src/pages/MetaMaskPopupPage";
@@ -13,6 +13,7 @@ const deBridgePageUrlPart = "https://app.debridge.finance/";
 const payToken = "Polygon";
 const currency = "MATIC";
 const seed = process.env.SEED;
+const networkTestId = "popular-network-0x89";
 
 test("Verify that wallet address and token balance are correct", async ({
   context,
@@ -20,9 +21,12 @@ test("Verify that wallet address and token balance are correct", async ({
 }) => {
   let metamaskPage = await focusOnPage(context, extensionUrlPart);
   const metaMaskOnboardingPage = new MetaMaskOnboardingPage(metamaskPage);
-  await metaMaskOnboardingPage.importExistingWallet(seed!, password);
+  await metaMaskOnboardingPage.importExistingWallet(
+    seed!,
+    password,
+    networkTestId
+  );
   await metaMaskOnboardingPage.lockPage();
-  await metamaskPage.close();
 
   let deBridgePage = await context.newPage();
   const deBridgeHomePage = new DeBridgeHomePage(deBridgePage);
