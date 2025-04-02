@@ -5,51 +5,49 @@ import { DeBridgeHomePage } from "../src/pages/DeBridgeHomePage";
 import { MetaMaskOnboardingPage } from "../src/pages/MetaMaskOnboardingPage";
 import { MetaMaskNotificationPage } from "../src/pages/MetaMaskNotificationPage";
 import { MetaMaskPopupPage } from "../src/pages/MetaMaskPopupPage";
+import { basicTestValues } from "../test-data/walletConfig.values";
 
-//TODO e.g. pass as env variable/test data
-const password = "28032025debridge";
-const extensionUrlPart = "chrome-extension://";
-const deBridgePageUrlPart = "https://app.debridge.finance/";
-const payToken = "Polygon";
-const currency = "MATIC";
 const seed = process.env.SEED;
-const networkTestId = "popular-network-0x89";
+const password = process.env.PASSWORD;
 
 test("Verify that wallet address and token balance are correct", async ({
   context,
   extensionId,
 }) => {
-  let metamaskPage = await focusOnPage(context, extensionUrlPart);
+  let metamaskPage = await focusOnPage(
+    context,
+    basicTestValues.extensionUrlPart
+  );
   const metaMaskOnboardingPage = new MetaMaskOnboardingPage(metamaskPage);
   await metaMaskOnboardingPage.importExistingWallet(
     seed!,
-    password,
-    networkTestId
+    password!,
+    basicTestValues.networkTestId
   );
   await metaMaskOnboardingPage.lockPage();
 
   let deBridgePage = await context.newPage();
   const deBridgeHomePage = new DeBridgeHomePage(deBridgePage);
   await deBridgeHomePage.openDebridgeApp();
-  await deBridgeHomePage.connectWallet(payToken, currency);
+  await deBridgeHomePage.connectWallet(
+    basicTestValues.payToken,
+    basicTestValues.currency
+  );
 
-  metamaskPage = await focusOnPage(context, extensionUrlPart);
+  metamaskPage = await focusOnPage(context, basicTestValues.extensionUrlPart);
   const metaMaskNotificationPage = new MetaMaskNotificationPage(metamaskPage);
-  await metaMaskNotificationPage.logIn(password);
+  await metaMaskNotificationPage.logIn(password!);
   await metaMaskNotificationPage.connectAccount();
 
-  await focusOnPage(context, deBridgePageUrlPart, true);
-  const balanceOfTokenOnDeBridge =
-    await deBridgeHomePage.getBalanceOfNativeToken();
+  await focusOnPage(context, basicTestValues.deBridgePageUrlPart, true);
+  const balanceOfTokenOnDeBridge = await deBridgeHomePage.getBalanceOfNativeToken();
   const walletAddressOnDeBridge = await deBridgeHomePage.getWalletAddress();
 
   metamaskPage = await context.newPage();
   const metaMaskPopUpPage = new MetaMaskPopupPage(metamaskPage);
   await metaMaskPopUpPage.openPage(extensionId);
-
   const balanceOfTokenOnPopup = await metaMaskPopUpPage.getCurrentTokenValue();
-  const walletAddressOnPopup =
-    await metaMaskPopUpPage.getCurrentWalletAddress();
+  const walletAddressOnPopup = await metaMaskPopUpPage.getCurrentWalletAddress();
   expect.soft(balanceOfTokenOnDeBridge).toBe(balanceOfTokenOnPopup);
   expect.soft(walletAddressOnDeBridge).toBe(walletAddressOnPopup);
 });
